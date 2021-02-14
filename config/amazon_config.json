@@ -1,0 +1,64 @@
+
+
+{
+  "configs": [
+    {
+      "note": "3600x",
+      "asin_groups": 1,
+      "asin_list_1": ["B08166SLDF"],
+      "reserve_min_1": 250,
+      "reserve_max_1": 320,
+      "amazon_website": "smile.amazon.com"
+    },
+    {
+      "note": "3070",
+      "asin_groups": 1,
+      "asin_list_1": ["B08WCF4SVC"],
+      "reserve_min_1": 550,
+      "reserve_max_1": 750,
+      "amazon_website": "smile.amazon.com"
+    },
+    {
+      "asin_groups": 1,
+      "asin_list_1": ["B08WC81Z5D"],
+      "reserve_min_1": 550,
+      "reserve_max_1": 750,
+      "amazon_website": "smile.amazon.com"
+    },
+    {
+      "asin_groups": 1,
+      "asin_list_1": ["B08KWN2LZG"],
+      "reserve_min_1": 550,
+      "reserve_max_1": 750,
+      "amazon_website": "smile.amazon.com"
+    },
+    {
+      "asin_groups": 1,
+      "asin_list_1": ["B08KY266MG"],
+      "reserve_min_1": 550,
+      "reserve_max_1": 750,
+      "amazon_website": "smile.amazon.com"
+    },
+    {
+      "asin_groups": 1,
+      "asin_list_1": ["B08M14Y3C7"],
+      "reserve_min_1": 550,
+      "reserve_max_1": 750,
+      "amazon_website": "smile.amazon.com"
+    },
+    {
+      "asin_groups": 1,
+      "asin_list_1": ["B08L8L9TCZ"],
+      "reserve_min_1": 550,
+      "reserve_max_1": 750,
+      "amazon_website": "smile.amazon.com"
+    },
+    {
+      "asin_groups": 1,
+      "asin_list_1": ["B08LF1CWT2"],
+      "reserve_min_1": 550,
+      "reserve_max_1": 750,
+      "amazon_website": "smile.amazon.com"
+    }
+  ]
+}
