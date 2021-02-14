@@ -1610,10 +1610,7 @@ class Amazon:
         except FileNotFoundError:
             pass
         try:
-            if self.headless:
-                self.driver = webdriver.PhantomJS()
-            else:
-                self.driver = webdriver.Chrome(executable_path=binary_path, options=options)
+            self.driver = webdriver.Chrome(executable_path=binary_path, options=options)
             self.wait = WebDriverWait(self.driver, 10)
             self.get_webdriver_pids()
         except Exception as e:

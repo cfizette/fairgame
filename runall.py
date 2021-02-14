@@ -14,7 +14,7 @@ if __name__ == "__main__":
         processes = []
         for i, c in enumerate(conf["configs"]):
             f =  open("logs/index-logs/{}.log".format(i), "w")
-            p = subprocess.Popen("python app.py amazon --no-image --p=1 --conf-index=3 >> logs/index-logs/{}.log".format(i, i), shell=True, stdout=f)
+            p = subprocess.Popen("python app.py amazon --no-image --p=1 --conf-index=3 --headless >> logs/index-logs/{}.log".format(i, i), shell=True, stdout=f)
             #p.communicate()
             processes.append(p)
             break
