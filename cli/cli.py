@@ -196,6 +196,7 @@ def main():
     default=False,
     help="Directly hit the offers page.  Preferred, but deprecated by Amazon.",
 )
+@click.option("--conf-index", default=None, type=int)
 @notify_on_crash
 def amazon(
     no_image,
@@ -216,6 +217,7 @@ def amazon(
     clean_profile,
     clean_credentials,
     alt_offers,
+    conf_index
 ):
     notification_handler.sound_enabled = not disable_sound
     if not notification_handler.sound_enabled:
@@ -248,6 +250,7 @@ def amazon(
         log_stock_check=log_stock_check,
         shipping_bypass=shipping_bypass,
         alt_offers=alt_offers,
+        conf_index=conf_index
     )
     try:
         amzn_obj.run(delay=delay, test=test)

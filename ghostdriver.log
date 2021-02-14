@@ -1,0 +1,221 @@
+[INFO  - 2021-02-14T05:30:26.860Z] GhostDriver - Main - running on port 52309
+[INFO  - 2021-02-14T05:30:27.670Z] Session [bedb2230-6e85-11eb-aa3e-1b2251964d91] - page.settings - {"XSSAuditingEnabled":false,"javascriptCanCloseWindows":true,"javascriptCanOpenWindows":true,"javascriptEnabled":true,"loadImages":true,"localToRemoteUrlAccessEnabled":false,"userAgent":"Mozilla/5.0 (Unknown; Linux x86_64) AppleWebKit/538.1 (KHTML, like Gecko) PhantomJS/2.1.1 Safari/538.1","webSecurityEnabled":true}
+[INFO  - 2021-02-14T05:30:27.670Z] Session [bedb2230-6e85-11eb-aa3e-1b2251964d91] - page.customHeaders:  - {}
+[INFO  - 2021-02-14T05:30:27.670Z] Session [bedb2230-6e85-11eb-aa3e-1b2251964d91] - Session.negotiatedCapabilities - {"browserName":"phantomjs","version":"2.1.1","driverName":"ghostdriver","driverVersion":"1.2.0","platform":"linux-unknown-64bit","javascriptEnabled":true,"takesScreenshot":true,"handlesAlerts":false,"databaseEnabled":false,"locationContextEnabled":false,"applicationCacheEnabled":false,"browserConnectionEnabled":false,"cssSelectorsEnabled":true,"webStorageEnabled":false,"rotatable":false,"acceptSslCerts":false,"nativeEvents":true,"proxy":{"proxyType":"direct"}}
+[INFO  - 2021-02-14T05:30:27.670Z] SessionManagerReqHand - _postNewSessionCommand - New Session Created: bedb2230-6e85-11eb-aa3e-1b2251964d91
+[ERROR - 2021-02-14T05:30:27.910Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280627884
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:28.312Z] Session [bedb2230-6e85-11eb-aa3e-1b2251964d91] - page.onError - msg: null
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:28.312Z] Session [bedb2230-6e85-11eb-aa3e-1b2251964d91] - page.onError - stack:
+  logError (https://smile.amazon.com/gp/chpf/homepage:39)
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:28.313Z] Session [bedb2230-6e85-11eb-aa3e-1b2251964d91] - page.onError - msg: null
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:28.313Z] Session [bedb2230-6e85-11eb-aa3e-1b2251964d91] - page.onError - stack:
+  logError (https://smile.amazon.com/gp/chpf/homepage:39)
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:28.313Z] Session [bedb2230-6e85-11eb-aa3e-1b2251964d91] - page.onError - msg: null
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:28.313Z] Session [bedb2230-6e85-11eb-aa3e-1b2251964d91] - page.onError - stack:
+  logError (https://smile.amazon.com/gp/chpf/homepage:39)
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:28.583Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280628571
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:29.828Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280629815
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:30.665Z] Session [bedb2230-6e85-11eb-aa3e-1b2251964d91] - page.onError - msg: null
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:30.665Z] Session [bedb2230-6e85-11eb-aa3e-1b2251964d91] - page.onError - stack:
+  logError (https://smile.amazon.com/ap/signin?_encoding=UTF8&ie=UTF8&openid.assoc_handle=amzn_smile&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fsmile.amazon.com%2Fgp%2Fcharity%2Fhomepage.html%3Fie%3DUTF8%26%252AVersion%252A%3D1%26%252Aentries%252A%3D0%26newts%3D1:26)
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:30.665Z] Session [bedb2230-6e85-11eb-aa3e-1b2251964d91] - page.onError - msg: null
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:30.665Z] Session [bedb2230-6e85-11eb-aa3e-1b2251964d91] - page.onError - stack:
+  logError (https://smile.amazon.com/ap/signin?_encoding=UTF8&ie=UTF8&openid.assoc_handle=amzn_smile&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fsmile.amazon.com%2Fgp%2Fcharity%2Fhomepage.html%3Fie%3DUTF8%26%252AVersion%252A%3D1%26%252Aentries%252A%3D0%26newts%3D1:26)
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:30.666Z] Session [bedb2230-6e85-11eb-aa3e-1b2251964d91] - page.onError - msg: null
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:30.666Z] Session [bedb2230-6e85-11eb-aa3e-1b2251964d91] - page.onError - stack:
+  logError (https://smile.amazon.com/ap/signin?_encoding=UTF8&ie=UTF8&openid.assoc_handle=amzn_smile&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fsmile.amazon.com%2Fgp%2Fcharity%2Fhomepage.html%3Fie%3DUTF8%26%252AVersion%252A%3D1%26%252Aentries%252A%3D0%26newts%3D1:26)
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:30.666Z] Session [bedb2230-6e85-11eb-aa3e-1b2251964d91] - page.onError - msg: null
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:30.666Z] Session [bedb2230-6e85-11eb-aa3e-1b2251964d91] - page.onError - stack:
+  logError (https://smile.amazon.com/ap/signin?_encoding=UTF8&ie=UTF8&openid.assoc_handle=amzn_smile&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fsmile.amazon.com%2Fgp%2Fcharity%2Fhomepage.html%3Fie%3DUTF8%26%252AVersion%252A%3D1%26%252Aentries%252A%3D0%26newts%3D1:26)
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:30.666Z] Session [bedb2230-6e85-11eb-aa3e-1b2251964d91] - page.onError - msg: null
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:30.666Z] Session [bedb2230-6e85-11eb-aa3e-1b2251964d91] - page.onError - stack:
+  logError (https://smile.amazon.com/ap/signin?_encoding=UTF8&ie=UTF8&openid.assoc_handle=amzn_smile&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fsmile.amazon.com%2Fgp%2Fcharity%2Fhomepage.html%3Fie%3DUTF8%26%252AVersion%252A%3D1%26%252Aentries%252A%3D0%26newts%3D1:26)
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:30.666Z] Session [bedb2230-6e85-11eb-aa3e-1b2251964d91] - page.onError - msg: null
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:30.666Z] Session [bedb2230-6e85-11eb-aa3e-1b2251964d91] - page.onError - stack:
+  logError (https://smile.amazon.com/ap/signin?_encoding=UTF8&ie=UTF8&openid.assoc_handle=amzn_smile&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fsmile.amazon.com%2Fgp%2Fcharity%2Fhomepage.html%3Fie%3DUTF8%26%252AVersion%252A%3D1%26%252Aentries%252A%3D0%26newts%3D1:26)
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:31.462Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280631453
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:32.734Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280632723
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:32.988Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280632977
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:33.238Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280633229
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:33.487Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280633479
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:33.739Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280633729
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:34.001Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280633992
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:34.250Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280634241
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:34.500Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280634491
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:34.750Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280634741
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:35.011Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280635000
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:35.262Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280635252
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:35.511Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280635502
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:35.765Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280635754
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:36.018Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280636010
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:36.267Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280636257
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:36.530Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280636520
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:36.780Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280636771
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:37.030Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280637020
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:37.282Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280637273
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:37.533Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280637523
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:37.781Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280637771
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:38.032Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280638022
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:38.282Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280638273
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:38.534Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280638524
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:38.785Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280638776
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:39.034Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280639025
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:39.286Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280639277
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:39.536Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280639528
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:39.789Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280639780
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:40.041Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280640031
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:40.290Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280640282
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:40.539Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280640531
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:40.788Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280640780
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:41.040Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280641030
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:41.289Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280641280
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:41.536Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280641529
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:41.789Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280641779
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:42.039Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280642031
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:42.293Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280642285
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:42.554Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280642541
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:42.805Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280642795
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:43.102Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280643094
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:30:43.355Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280643346
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:31:00.431Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280660422
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:31:17.495Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280677486
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:31:34.570Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280694561
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-02-14T05:31:51.642Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1613280711634
+
+  phantomjs://platform/console++.js:263 in error

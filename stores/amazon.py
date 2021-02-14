@@ -108,6 +108,7 @@ class Amazon:
         log_stock_check=False,
         shipping_bypass=False,
         alt_offers=False,
+        conf_index=None
     ):
         self.notification_handler = notification_handler
         self.asin_list = []
@@ -137,6 +138,7 @@ class Amazon:
         self.shipping_bypass = shipping_bypass
         self.unknown_title_notification_sent = False
         self.alt_offers = alt_offers
+        self.conf_index = conf_index
 
         presence.enabled = not disable_presence
 
@@ -166,24 +168,50 @@ class Amazon:
                 raise
 
         if os.path.exists(AUTOBUY_CONFIG_PATH):
-            with open(AUTOBUY_CONFIG_PATH) as json_file:
-                try:
-                    config = json.load(json_file)
-                    self.asin_groups = int(config["asin_groups"])
-                    self.amazon_website = config.get(
-                        "amazon_website", "smile.amazon.com"
-                    )
-                    for x in range(self.asin_groups):
-                        self.asin_list.append(config[f"asin_list_{x + 1}"])
-                        self.reserve_min.append(float(config[f"reserve_min_{x + 1}"]))
-                        self.reserve_max.append(float(config[f"reserve_max_{x + 1}"]))
-                    # assert isinstance(self.asin_list, list)
-                except Exception as e:
-                    log.error(f"{e} is missing")
-                    log.error(
-                        "amazon_config.json file not formatted properly: https://github.com/Hari-Nagarajan/fairgame/wiki/Usage#json-configuration"
-                    )
-                    exit(0)
+            if self.conf_index is None:
+                with open(AUTOBUY_CONFIG_PATH) as json_file:
+                    try:
+                        config = json.load(json_file)
+                        self.asin_groups = int(config["asin_groups"])
+                        self.amazon_website = config.get(
+                            "amazon_website", "smile.amazon.com"
+                        )
+                        for x in range(self.asin_groups):
+                            self.asin_list.append(config[f"asin_list_{x + 1}"])
+                            self.reserve_min.append(float(config[f"reserve_min_{x + 1}"]))
+                            self.reserve_max.append(float(config[f"reserve_max_{x + 1}"]))
+                        # assert isinstance(self.asin_list, list)
+                    except Exception as e:
+                        log.error(f"{e} is missing")
+                        log.error(
+                            "amazon_config.json file not formatted properly: https://github.com/Hari-Nagarajan/fairgame/wiki/Usage#json-configuration"
+                        )
+                        exit(0)
+            else:
+                log.info("Configuration index set to {}".format(self.conf_index))
+                with open(AUTOBUY_CONFIG_PATH) as json_file:
+                    try:
+                        configs = json.load(json_file)
+                        log.info(configs)
+                        config = configs['configs'][self.conf_index]
+                        log.info(config)
+                        self.asin_groups = int(config["asin_groups"])
+                        self.amazon_website = config.get(
+                            "amazon_website", "smile.amazon.com"
+                        )
+                        for x in range(self.asin_groups):
+                            self.asin_list.append(config[f"asin_list_{x + 1}"])
+                            self.reserve_min.append(float(config[f"reserve_min_{x + 1}"]))
+                            self.reserve_max.append(float(config[f"reserve_max_{x + 1}"]))
+                        # assert isinstance(self.asin_list, list)
+                    except Exception as e:
+                        log.error(f"{e} is missing")
+                        log.error(
+                            "amazon_config.json file not formatted properly: https://github.com/Hari-Nagarajan/fairgame/wiki/Usage#json-configuration"
+                        )
+                        exit(0)
+
+            
         else:
             log.error(
                 "No config file found, see here on how to fix this: https://github.com/Hari-Nagarajan/fairgame/wiki/Usage#json-configuration"
@@ -211,12 +239,13 @@ class Amazon:
             try:
                 self.get_page(url=AMAZON_URLS["BASE_URL"])
                 break
-            except sel_exceptions.WebDriverException:
+            except sel_exceptions.WebDriverException as e:
                 log.error(
                     "Couldn't talk to "
                     + AMAZON_URLS["BASE_URL"]
                     + ", if the address is right, there might be a network outage..."
                 )
+                log.error(e, exc_info=True)
                 time.sleep(3)
                 pass
         cart_quantity = self.get_cart_count()
@@ -1559,7 +1588,8 @@ class Amazon:
             else:
                 prefs["profile.managed_default_content_settings.images"] = 0
             options.add_experimental_option("prefs", prefs)
-            options.add_argument(f"user-data-dir={path_to_profile}")
+            # Not sure why I need this...
+            #options.add_argument(f"user-data-dir={path_to_profile}")
             if not self.slow_mode:
                 options.set_capability("pageLoadStrategy", "none")
 
@@ -1578,7 +1608,10 @@ class Amazon:
         except FileNotFoundError:
             pass
         try:
-            self.driver = webdriver.Chrome(executable_path=binary_path, options=options)
+            if self.headless:
+                self.driver = webdriver.PhantomJS()
+            else:
+                self.driver = webdriver.Chrome(executable_path=binary_path, options=options)
             self.wait = WebDriverWait(self.driver, 10)
             self.get_webdriver_pids()
         except Exception as e:
