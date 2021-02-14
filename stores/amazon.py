@@ -44,7 +44,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from utils import discord_presence as presence
 from utils.debugger import debug
-from utils.logger import log
+from utils.logger import make_logger
 from utils.selenium_utils import options, enable_headless
 
 # Optional OFFER_URL is:     "OFFER_URL": "https://{domain}/dp/",
@@ -148,10 +148,12 @@ class Amazon:
         amazon_config = global_config.get_amazon_config(encryption_pass)
         self.profile_path = global_config.get_browser_profile_path()
 
+        self.logger = make_logger(conf_index)
+
         try:
             presence.start_presence()
         except Exception in pyexceptions:
-            log.error("Discord presence failed to load")
+            self.logger.error("Discord presence failed to load")
             presence.enabled = False
 
         # Create necessary sub-directories if they don't exist
@@ -182,19 +184,19 @@ class Amazon:
                             self.reserve_max.append(float(config[f"reserve_max_{x + 1}"]))
                         # assert isinstance(self.asin_list, list)
                     except Exception as e:
-                        log.error(f"{e} is missing")
-                        log.error(
+                        self.logger.error(f"{e} is missing")
+                        self.logger.error(
                             "amazon_config.json file not formatted properly: https://github.com/Hari-Nagarajan/fairgame/wiki/Usage#json-configuration"
                         )
                         exit(0)
             else:
-                log.info("Configuration index set to {}".format(self.conf_index))
+                self.logger.info("Configuration index set to {}".format(self.conf_index))
                 with open(AUTOBUY_CONFIG_PATH) as json_file:
                     try:
                         configs = json.load(json_file)
-                        log.info(configs)
+                        self.logger.info(configs)
                         config = configs['configs'][self.conf_index]
-                        log.info(config)
+                        self.logger.info(config)
                         self.asin_groups = int(config["asin_groups"])
                         self.amazon_website = config.get(
                             "amazon_website", "smile.amazon.com"
@@ -205,15 +207,15 @@ class Amazon:
                             self.reserve_max.append(float(config[f"reserve_max_{x + 1}"]))
                         # assert isinstance(self.asin_list, list)
                     except Exception as e:
-                        log.error(f"{e} is missing")
-                        log.error(
+                        self.logger.error(f"{e} is missing")
+                        self.logger.error(
                             "amazon_config.json file not formatted properly: https://github.com/Hari-Nagarajan/fairgame/wiki/Usage#json-configuration"
                         )
                         exit(0)
 
             
         else:
-            log.error(
+            self.logger.error(
                 "No config file found, see here on how to fix this: https://github.com/Hari-Nagarajan/fairgame/wiki/Usage#json-configuration"
             )
             exit(0)
@@ -224,7 +226,7 @@ class Amazon:
         for key in AMAZON_URLS.keys():
             AMAZON_URLS[key] = AMAZON_URLS[key].format(domain=self.amazon_website)
         if self.alt_offers:
-            log.info("Using alternate page for offer parsing.")
+            self.logger.info("Using alternate page for offer parsing.")
             self.ACTIVE_OFFER_URL = AMAZON_URLS["ALT_OFFER_URL"]
         else:
             self.ACTIVE_OFFER_URL = AMAZON_URLS["OFFER_URL"]
@@ -234,26 +236,26 @@ class Amazon:
         self.refresh_delay = delay
         self.show_config()
 
-        log.info("Waiting for home page.")
+        self.logger.info("Waiting for home page.")
         while True:
             try:
                 self.get_page(url=AMAZON_URLS["BASE_URL"])
                 break
             except sel_exceptions.WebDriverException as e:
-                log.error(
+                self.logger.error(
                     "Couldn't talk to "
                     + AMAZON_URLS["BASE_URL"]
                     + ", if the address is right, there might be a network outage..."
                 )
-                log.error(e, exc_info=True)
+                self.logger.error(e, exc_info=True)
                 time.sleep(3)
                 pass
         cart_quantity = self.get_cart_count()
         if cart_quantity > 0:
-            log.warning(f"Found {cart_quantity} item(s) in your cart.")
-            log.info("Delete all item(s) in cart before starting bot.")
+            self.logger.warning(f"Found {cart_quantity} item(s) in your cart.")
+            self.logger.info("Delete all item(s) in cart before starting bot.")
             self.driver.get(AMAZON_URLS["CART_URL"])
-            log.info("Exiting in 30 seconds...")
+            self.logger.info("Exiting in 30 seconds...")
             time.sleep(30)
             return
         self.handle_startup()
@@ -264,16 +266,16 @@ class Amazon:
             "Bot Logged in and Starting up", "Start-Up", self.take_screenshots
         )
         if self.get_cart_count() > 0:
-            log.warning(f"Found {cart_quantity} item(s) in your cart.")
-            log.info("Delete all item(s) in cart before starting bot.")
+            self.logger.warning(f"Found {cart_quantity} item(s) in your cart.")
+            self.logger.info("Delete all item(s) in cart before starting bot.")
             self.driver.get(AMAZON_URLS["CART_URL"])
-            log.info("Exiting in 30 seconds...")
+            self.logger.info("Exiting in 30 seconds...")
             time.sleep(30)
             return
 
         keep_going = True
 
-        log.info("Checking stock for items.")
+        self.logger.info("Checking stock for items.")
 
         while keep_going:
             asin = self.run_asins(delay)
@@ -312,26 +314,26 @@ class Amazon:
             if not self.asin_list:
                 keep_going = False
         runtime = time.time() - self.start_time
-        log.info(f"FairGame bot ran for {runtime} seconds.")
+        self.logger.info(f"FairGame bot ran for {runtime} seconds.")
         time.sleep(10)  # add a delay to shut stuff done
 
     def fail_to_checkout_note(self):
-        log.info(
+        self.logger.info(
             "It's likely that the product went out of stock before FairGame could checkout."
         )
-        log.info(
+        self.logger.info(
             "Also verify that your default shipping and payment options are selected and work correctly."
         )
-        log.info("FairGame WILL NOT select shipping and payment options for you.")
-        log.info("Better luck next time.")
+        self.logger.info("FairGame WILL NOT select shipping and payment options for you.")
+        self.logger.info("Better luck next time.")
 
     @debug
     def handle_startup(self):
         time.sleep(self.page_wait_delay())
         if self.is_logged_in():
-            log.info("Already logged in")
+            self.logger.info("Already logged in")
         else:
-            log.info("Lets log in.")
+            self.logger.info("Lets log in.")
 
             is_smile = "smile" in AMAZON_URLS["BASE_URL"]
             xpath = (
@@ -343,8 +345,8 @@ class Amazon:
             try:
                 self.driver.find_element_by_xpath(xpath).click()
             except sel_exceptions.NoSuchElementException:
-                log.error("Log in button does not exist")
-            log.info("Wait for Sign In page")
+                self.logger.error("Log in button does not exist")
+            self.logger.info("Wait for Sign In page")
             time.sleep(self.page_wait_delay())
 
     @debug
@@ -358,7 +360,7 @@ class Amazon:
 
     @debug
     def login(self):
-        log.info("Email")
+        self.logger.info("Email")
         email_field = None
         password_field = None
         timeout = self.get_timeout()
@@ -381,39 +383,39 @@ class Amazon:
             try:
                 email_field.send_keys(amazon_config["username"] + Keys.RETURN)
             except sel_exceptions.ElementNotInteractableException:
-                log.info("Email not needed.")
+                self.logger.info("Email not needed.")
         else:
-            log.info("Email not needed.")
+            self.logger.info("Email not needed.")
 
         if "reverification" in self.driver.current_url:
-            log.warning(
+            self.logger.warning(
                 "Beta code for allowing user to solve OTP.  Please report success/failures "
                 "to #feature-testing on Discord"
             )
             # Maybe/Probably/Likely a One Time Password prompt?  Let's wait until the user takes action
             self.notification_handler.play_alarm_sound()
-            log.error("One Time Password input required... pausing for user input")
+            self.logger.error("One Time Password input required... pausing for user input")
             try:
                 WebDriverWait(self.driver, timeout=300).until(
                     lambda d: "/ap/" not in d.driver.current_url
                 )
             except sel_exceptions.TimeoutException:
-                log.error("User did not solve One Time Password prompt in time.")
+                self.logger.error("User did not solve One Time Password prompt in time.")
 
         if self.driver.find_elements_by_xpath('//*[@id="auth-error-message-box"]'):
-            log.error("Login failed, delete your credentials file")
+            self.logger.error("Login failed, delete your credentials file")
             time.sleep(240)
             exit(1)
 
         time.sleep(self.page_wait_delay())
 
-        log.info("Remember me checkbox")
+        self.logger.info("Remember me checkbox")
         try:
             self.driver.find_element_by_xpath('//*[@name="rememberMe"]').click()
         except sel_exceptions.NoSuchElementException:
-            log.error("Remember me checkbox did not exist")
+            self.logger.error("Remember me checkbox did not exist")
 
-        log.info("Password")
+        self.logger.info("Password")
         password_field = None
         timeout = self.get_timeout()
         current_page = self.driver.title
@@ -440,16 +442,16 @@ class Amazon:
                 password_field.send_keys(Keys.RETURN)
                 self.wait_for_page_change(current_page)
         else:
-            log.error("Password entry box did not exist")
+            self.logger.error("Password entry box did not exist")
 
         if captcha_entry:
             self.handle_captcha(False)
         if self.driver.title in amazon_config["TWOFA_TITLES"]:
-            log.info("enter in your two-step verification code in browser")
+            self.logger.info("enter in your two-step verification code in browser")
             while self.driver.title in amazon_config["TWOFA_TITLES"]:
                 # Wait for the user to enter 2FA
                 time.sleep(2)
-        log.info(f'Logged in as {amazon_config["username"]}')
+        self.logger.info(f'Logged in as {amazon_config["username"]}')
 
     @debug
     def run_asins(self, delay):
@@ -459,16 +461,16 @@ class Amazon:
                 for asin in self.asin_list[i]:
                     # start_time = time.time()
                     if self.log_stock_check:
-                        log.info(f"Checking ASIN: {asin}.")
+                        self.logger.info(f"Checking ASIN: {asin}.")
                     if self.check_stock(asin, self.reserve_min[i], self.reserve_max[i]):
                         return asin
-                    # log.info(f"check time took {time.time()-start_time} seconds")
+                    # self.logger.info(f"check time took {time.time()-start_time} seconds")
                     time.sleep(delay)
 
     @debug
     def check_stock(self, asin, reserve_min, reserve_max, retry=0):
         if retry > DEFAULT_MAX_ATC_TRIES:
-            log.info("max add to cart retries hit, returning to asin check")
+            self.logger.info("max add to cart retries hit, returning to asin check")
             return False
 
         if self.alt_offers:
@@ -496,26 +498,26 @@ class Amazon:
         while True:
             try:
                 self.get_page(f.url)
-                log.debug(f"Initial page title {self.driver.title}")
-                log.debug(f"        page url: {self.driver.current_url}")
+                self.logger.debug(f"Initial page title {self.driver.title}")
+                self.logger.debug(f"        page url: {self.driver.current_url}")
                 if self.driver.title in amazon_config["CAPTCHA_PAGE_TITLES"]:
                     self.handle_captcha()
                 break
             except Exception:
                 fail_counter += 1
-                log.error(f"Failed to load the offer URL {fail_counter} times.")
+                self.logger.error(f"Failed to load the offer URL {fail_counter} times.")
                 if fail_counter < DEFAULT_MAX_URL_FAIL:
-                    log.error(
+                    self.logger.error(
                         f"WebDriver will restart if it fails {DEFAULT_MAX_URL_FAIL} times. Retrying now..."
                     )
                     time.sleep(3)
                 else:
-                    log.info(
+                    self.logger.info(
                         "Attempting to delete and recreate current chrome instance"
                     )
                     if not self.delete_driver():
-                        log.error("Failed to delete chrome processes")
-                        log.error("Please restart bot")
+                        self.logger.error("Failed to delete chrome processes")
+                        self.logger.error("Please restart bot")
                         self.send_notification(
                             message="Bot Failed, please restart bot",
                             page_name="Bot Failed",
@@ -523,8 +525,8 @@ class Amazon:
                         )
                         raise RuntimeError("Failed to restart bot")
                     elif not self.create_driver(self.profile_path):
-                        log.error("Failed to recreate webdriver processes")
-                        log.error("Please restart bot")
+                        self.logger.error("Failed to recreate webdriver processes")
+                        self.logger.error("Please restart bot")
                         self.send_notification(
                             message="Bot Failed, please restart bot",
                             page_name="Bot Failed",
@@ -532,7 +534,7 @@ class Amazon:
                         )
                         raise RuntimeError("Failed to restart bot")
                     else:  # deleted driver and recreated it succesfully
-                        log.info(
+                        self.logger.info(
                             "WebDriver recreated successfully. Returning back to stock check"
                         )
                         return False
@@ -550,11 +552,11 @@ class Amazon:
                     )
                 )
                 if footer and footer[0].tag_name == "img":
-                    log.info(f"Saw dogs for {asin}.  Skipping...")
+                    self.logger.info(f"Saw dogs for {asin}.  Skipping...")
                     return False
 
-                log.debug(f"After footer page title {self.driver.title}")
-                log.debug(f"             page url: {self.driver.current_url}")
+                self.logger.debug(f"After footer page title {self.driver.title}")
+                self.logger.debug(f"             page url: {self.driver.current_url}")
 
                 offers = WebDriverWait(self.driver, timeout=DEFAULT_MAX_TIMEOUT).until(
                     lambda d: d.find_element_by_xpath(
@@ -569,7 +571,7 @@ class Amazon:
                 offer_id = offers.get_attribute("id")
                 if offer_id == "outOfStock" or offer_id == "backInStock":
                     # No dice... Early out and move on
-                    log.info("Item is currently unavailable.  Moving on...")
+                    self.logger.info("Item is currently unavailable.  Moving on...")
                     return False
 
                 if offer_id == "olpOfferList":
@@ -597,7 +599,7 @@ class Amazon:
                         # This means we have a flyout already loading, as it gets inserted as the first
                         # div after the body tag of the document.  Wait for the container to load and start
                         # the loop again to scan for known elements
-                        log.debug(
+                        self.logger.debug(
                             "Found a loading flyout div.  Waiting for offers to load..."
                         )
                         WebDriverWait(self.driver, timeout=DEFAULT_MAX_TIMEOUT).until(
@@ -607,19 +609,19 @@ class Amazon:
                         )
                         continue
 
-                    log.debug("Attempting to click the open offers link...")
+                    self.logger.debug("Attempting to click the open offers link...")
                     open_offers_link.click()
                     try:
                         # Now wait for the flyout to load
-                        log.debug("Waiting for flyout...")
+                        self.logger.debug("Waiting for flyout...")
                         WebDriverWait(self.driver, timeout=DEFAULT_MAX_TIMEOUT).until(
                             lambda d: d.find_element_by_xpath(
                                 "//div[@id='aod-container'] | //div[@id='olpOfferList']"
                             )
                         )
-                        log.debug("Flyout should be open and populated.")
+                        self.logger.debug("Flyout should be open and populated.")
                     except sel_exceptions.TimeoutException as te:
-                        log.error(
+                        self.logger.error(
                             "Timed out waiting for the flyout to open and populate.  Is the "
                             "connection slow?  Do you see the flyout populate?"
                         )
@@ -629,15 +631,15 @@ class Amazon:
                     == "submit.add-to-cart-announce"
                 ):
                     # This assumes we're on a PDP with only an add to cart button... no offers
-                    log.warning(
+                    self.logger.warning(
                         "NOT YET IMPLEMENTED: PDP represents only item worth considering.  No other sellers available."
                         " TODO: Parse pricing and Add To Cart from PDP if item qualifies."
                     )
                 else:
-                    log.warning(
+                    self.logger.warning(
                         "We found elements, but didn't recognize any of the combinations."
                     )
-                    log.warning(f"Element found: {offers.tag_name}")
+                    self.logger.warning(f"Element found: {offers.tag_name}")
                     attrs = self.driver.execute_script(
                         "var items = {}; "
                         "for (index = 0; index < arguments[0].attributes.length; ++index) "
@@ -645,28 +647,28 @@ class Amazon:
                         "return items;",
                         offers,
                     )
-                    log.warning("Dumping element attributes:")
+                    self.logger.warning("Dumping element attributes:")
                     for attr in attrs:
-                        log.warning(f"{attr} = {attrs[attr]}")
+                        self.logger.warning(f"{attr} = {attrs[attr]}")
 
                     return False
                 if len(offer_count) == 0:
-                    log.info("No offers found.  Moving on.")
+                    self.logger.info("No offers found.  Moving on.")
                     return False
-                log.info(
+                self.logger.info(
                     f"Found {len(offer_count)} offers for {asin}.  Evaluating offers..."
                 )
 
             except sel_exceptions.TimeoutException as te:
-                log.error("Timed out waiting for offers to render.  Skipping...")
-                log.error(f"URL: {self.driver.current_url}")
-                log.exception(te)
+                self.logger.error("Timed out waiting for offers to render.  Skipping...")
+                self.logger.error(f"URL: {self.driver.current_url}")
+                self.logger.exception(te)
                 return False
             except sel_exceptions.NoSuchElementException:
-                log.error("Unable to find any offers listing.  Skipping...")
+                self.logger.error("Unable to find any offers listing.  Skipping...")
                 return False
             except sel_exceptions.ElementClickInterceptedException as e:
-                log.debug(
+                self.logger.debug(
                     "Covering element detected... Assuming it's a slow flyout... scanning document again..."
                 )
                 continue
@@ -686,7 +688,7 @@ class Amazon:
             #     #     "//div[@id='aod-offer-list']//input[@id='aod-total-offer-count']"
             #     # )
             #     if offer_count.get_attribute("value") == "0":
-            #         log.info("Found zero offers explicitly.  Moving to next ASIN.")
+            #         self.logger.info("Found zero offers explicitly.  Moving to next ASIN.")
             #         return False
             if atc_buttons:
                 # Early out if we found buttons
@@ -703,7 +705,7 @@ class Amazon:
             if test and (test.text in amazon_config["NO_SELLERS"]):
                 return False
             if time.time() > timeout:
-                log.info(f"failed to load page for {asin}, going to next ASIN")
+                self.logger.info(f"failed to load page for {asin}, going to next ASIN")
                 return False
 
         timeout = self.get_timeout()
@@ -723,7 +725,7 @@ class Amazon:
             if prices:
                 break
             if time.time() > timeout:
-                log.info(f"failed to load prices for {asin}, going to next ASIN")
+                self.logger.info(f"failed to load prices for {asin}, going to next ASIN")
                 return False
         shipping = []
         shipping_prices = []
@@ -737,7 +739,7 @@ class Amazon:
                 if shipping:
                     # Convert to prices just in case
                     for idx, shipping_node in enumerate(shipping):
-                        log.debug(f"Processing shipping node {idx}")
+                        self.logger.debug(f"Processing shipping node {idx}")
                         if self.checkshipping:
                             if amazon_config["SHIPPING_ONLY_IF"] in shipping_node.text:
                                 shipping_prices.append(parse_price("0"))
@@ -759,12 +761,12 @@ class Amazon:
                     break
 
                 if time.time() > timeout:
-                    log.info(f"failed to load shipping for {asin}, going to next ASIN")
+                    self.logger.info(f"failed to load shipping for {asin}, going to next ASIN")
                     return False
 
         in_stock = False
         for shipping_price in shipping_prices:
-            log.debug(f"\tShipping Price: {shipping_price}")
+            self.logger.debug(f"\tShipping Price: {shipping_price}")
 
         for idx, atc_button in enumerate(atc_buttons):
             # Condition check first, using the button to find the form that will divulge the item's condition
@@ -779,7 +781,7 @@ class Amazon:
                     # Lower condition value imply newer
                     if item_condition.value > self.condition.value:
                         # Item is below our standards, so skip it
-                        log.debug(
+                        self.logger.debug(
                             f"Skipping item because its condition is below the requested level: "
                             f"{item_condition} is below {self.condition}"
                         )
@@ -791,7 +793,7 @@ class Amazon:
                 else:
                     price = parse_price(prices[idx].text)
             except IndexError:
-                log.debug("Price index error")
+                self.logger.debug("Price index error")
                 return False
             try:
                 if self.checkshipping:
@@ -799,7 +801,7 @@ class Amazon:
                 else:
                     ship_price = parse_price("0")
             except IndexError:
-                log.debug("shipping index error")
+                self.logger.debug("shipping index error")
                 return False
             ship_float = ship_price.amount
             price_float = price.amount
@@ -815,14 +817,14 @@ class Amazon:
                 (ship_float + price_float) >= reserve_min
                 or math.isclose((price_float + ship_float), reserve_min, abs_tol=0.01)
             ):
-                log.info("Item in stock and in reserve range!")
-                log.info("Adding to cart")
+                self.logger.info("Item in stock and in reserve range!")
+                self.logger.info("Adding to cart")
                 # Get the offering ID
                 offering_id_elements = atc_button.find_elements_by_xpath(
                     "./preceding::input[@name='offeringID.1'][1]"
                 )
                 if offering_id_elements:
-                    log.info("Attempting Add To Cart with offer ID...")
+                    self.logger.info("Attempting Add To Cart with offer ID...")
                     offering_id = offering_id_elements[0].get_attribute("value")
                     if self.attempt_atc(
                         offering_id, max_atc_retries=DEFAULT_MAX_ATC_TRIES
@@ -837,7 +839,7 @@ class Amazon:
                         self.save_page_source("failed-atc")
                         return False
                 else:
-                    log.error(
+                    self.logger.error(
                         "Unable to find offering ID to add to cart.  Using legacy mode."
                     )
                     self.notification_handler.play_notify_sound()
@@ -850,14 +852,14 @@ class Amazon:
 
                     presence.buy_update()
                     current_title = self.driver.title
-                    # log.info(f"current page title is {current_title}")
+                    # self.logger.info(f"current page title is {current_title}")
                     try:
                         atc_button.click()
                     except IndexError:
-                        log.debug("Index Error")
+                        self.logger.debug("Index Error")
                         return False
                     self.wait_for_page_change(current_title)
-                    # log.info(f"page title is {self.driver.title}")
+                    # self.logger.info(f"page title is {self.driver.title}")
                     emtpy_cart_elements = self.driver.find_elements_by_xpath(
                         "//div[contains(@class, 'sc-your-amazon-cart-is-empty') or contains(@class, 'sc-empty-cart')]"
                     )
@@ -868,12 +870,12 @@ class Amazon:
                     ):
                         return True
                     else:
-                        log.info("did not add to cart, trying again")
+                        self.logger.info("did not add to cart, trying again")
                         if emtpy_cart_elements:
-                            log.info(
+                            self.logger.info(
                                 "Cart appeared empty after clicking Add To Cart button"
                             )
-                        log.debug(f"failed title was {self.driver.title}")
+                        self.logger.debug(f"failed title was {self.driver.title}")
                         self.send_notification(
                             "Failed Add to Cart", "failed-atc", self.take_screenshots
                         )
@@ -899,9 +901,9 @@ class Amazon:
                         with self.wait_for_page_content_change(timeout=10):
                             self.driver.find_element_by_xpath(xpath).click()
                     except sel_exceptions.NoSuchElementException:
-                        log.error("Continue button not present on page")
+                        self.logger.error("Continue button not present on page")
                 else:
-                    log.error("Continue button not present on page")
+                    self.logger.error("Continue button not present on page")
 
                 # verify cart is non-zero
                 if self.get_cart_count() != 0:
@@ -927,21 +929,21 @@ class Amazon:
         # time.sleep(self.page_wait_delay())
 
         title = self.driver.title
-        log.info(f"Navigating page title: '{title}'")
+        self.logger.info(f"Navigating page title: '{title}'")
         # see if this resolves blank page title issue?
         if title == "":
             timeout_seconds = DEFAULT_MAX_TIMEOUT
-            log.debug(
+            self.logger.debug(
                 f"Title was blank, checking to find a real title for {timeout_seconds} seconds"
             )
             timeout = self.get_timeout(timeout=timeout_seconds)
             while True:
                 if self.driver.title != "":
                     title = self.driver.title
-                    log.debug(f"found a real title: {title}.")
+                    self.logger.debug(f"found a real title: {title}.")
                     break
                 if time.time() > timeout:
-                    log.debug("Time out reached, page title was still blank.")
+                    self.logger.debug("Time out reached, page title was still blank.")
                     break
         if title in amazon_config["SIGN_IN_TITLES"]:
             self.login()
@@ -973,22 +975,22 @@ class Amazon:
                     self.take_screenshots,
                 )
                 self.unknown_title_notification_sent = True
-            log.warning(
+            self.logger.warning(
                 "Landed on address selection screen.  Fairgame will NOT select an address for you.  "
                 "Please select necessary options to arrive at the Review Order Page before the next "
                 "refresh, or complete checkout manually.  You have 30 seconds."
             )
             for i in range(30, 0, -1):
-                log.warning(f"{i}...")
+                self.logger.warning(f"{i}...")
                 time.sleep(1)
             return
         else:
-            log.debug(f"title is: [{title}]")
+            self.logger.debug(f"title is: [{title}]")
             # see if we can handle blank titles here
             time.sleep(
                 3
             )  # wait a few seconds for page to load, since we don't know what we are dealing with
-            log.warning(
+            self.logger.warning(
                 "FairGame is not sure what page it is on - will attempt to resolve."
             )
             ###################################################################
@@ -1004,7 +1006,7 @@ class Amazon:
             except sel_exceptions.NoSuchElementException:
                 pass
             if element:
-                log.info(
+                self.logger.info(
                     "FairGame thinks it completed the purchase, please verify ASAP"
                 )
                 self.send_notification(
@@ -1030,7 +1032,7 @@ class Amazon:
                 pass
             if element:
                 try:
-                    log.info(
+                    self.logger.info(
                         "FairGame thinks it is seeing a Prime Offer, attempting to click No Thanks"
                     )
                     element.click()
@@ -1038,7 +1040,7 @@ class Amazon:
                     # if we were able to click, return to program flow
                     return
                 except sel_exceptions.ElementNotInteractableException:
-                    log.debug("FairGame could not click No Thanks button")
+                    self.logger.debug("FairGame could not click No Thanks button")
 
             if self.shipping_bypass:
                 element = None
@@ -1049,11 +1051,11 @@ class Amazon:
                 except sel_exceptions.NoSuchElementException:
                     pass
                 if element:
-                    log.warning("FairGame thinks it needs to pick a shipping address.")
-                    log.warning(
+                    self.logger.warning("FairGame thinks it needs to pick a shipping address.")
+                    self.logger.warning(
                         "It will click whichever ship to this address button it found."
                     )
-                    log.warning(
+                    self.logger.warning(
                         "If this works, VERIFY THE ADDRESS IT SHIPPED TO IMMEDIATELY!"
                     )
                     self.send_notification(
@@ -1063,15 +1065,15 @@ class Amazon:
                     )
                     try:
                         element.click()
-                        log.info("Clicked button.")
+                        self.logger.info("Clicked button.")
                         self.wait_for_page_change(page_title=title)
                         return
                     except sel_exceptions.WebDriverException:
-                        log.error("Could not click ship to address button")
+                        self.logger.error("Could not click ship to address button")
 
             if self.get_cart_count() == 0:
-                log.info("It appears you have nothing in your cart.")
-                log.info("Returning to stock check.")
+                self.logger.info("It appears you have nothing in your cart.")
+                self.logger.info("Returning to stock check.")
                 self.try_to_checkout = False
                 return
 
@@ -1082,7 +1084,7 @@ class Amazon:
             # if above checks don't work, just continue on to trying to resolve
 
             # try to handle an unknown title
-            log.error(
+            self.logger.error(
                 f"'{title}' is not a known page title. Please create issue indicating the title with a screenshot of page"
             )
             self.send_notification(
@@ -1091,11 +1093,11 @@ class Amazon:
                 self.take_screenshots,
             )
             self.save_page_source("unknown-title")
-            log.info("going to try and redirect to cart page")
+            self.logger.info("going to try and redirect to cart page")
             try:
                 self.driver.get(AMAZON_URLS["CART_URL"])
             except sel_exceptions.WebDriverException:
-                log.error(
+                self.logger.error(
                     "failed to load cart URL, refreshing and returning to handler"
                 )
                 self.driver.refresh()
@@ -1107,12 +1109,12 @@ class Amazon:
             # note, not using greater than 0, in case there is an error,
             # still want to try and proceed, if possible
             if self.get_cart_count() == 0:
-                log.info("It appears you have nothing in your cart.")
-                log.info("Returning to stock check.")
+                self.logger.info("It appears you have nothing in your cart.")
+                self.logger.info("Returning to stock check.")
                 self.try_to_checkout = False
                 return
 
-            log.info("trying to click proceed to checkout")
+            self.logger.info("trying to click proceed to checkout")
             timeout = self.get_timeout()
             button = []
             while True:
@@ -1124,7 +1126,7 @@ class Amazon:
                 except sel_exceptions.NoSuchElementException:
                     pass
                 if time.time() > timeout:
-                    log.error(
+                    self.logger.error(
                         "Could not find and click button, refreshing and returning to handler"
                     )
                     self.driver.refresh()
@@ -1133,12 +1135,12 @@ class Amazon:
             if button:
                 try:
                     current_title = self.driver.title
-                    log.info("Found ptc button, attempting to click.")
+                    self.logger.info("Found ptc button, attempting to click.")
                     button.click()
-                    log.info("Clicked ptc button")
+                    self.logger.info("Clicked ptc button")
                     self.wait_for_page_change(page_title=current_title)
                 except sel_exceptions.WebDriverException:
-                    log.info(
+                    self.logger.info(
                         "Could not click button - refreshing and returning to checkout handler"
                     )
                     self.driver.refresh()
@@ -1155,13 +1157,13 @@ class Amazon:
             try:
                 return int(element.text)
             except Exception as e:
-                log.debug("Error converting cart number to integer")
-                log.debug(e)
+                self.logger.debug("Error converting cart number to integer")
+                self.logger.debug(e)
                 return -1
 
     @debug
     def handle_prime_signup(self):
-        log.info("Prime offer page popped up, attempting to click No Thanks")
+        self.logger.info("Prime offer page popped up, attempting to click No Thanks")
         time.sleep(
             2
         )  # just doing manual wait, sign up for prime if you don't want to deal with this
@@ -1172,8 +1174,8 @@ class Amazon:
                 '//*[contains(@class, "no-thanks-button") or contains(@class, "prime-nothanks-button") or contains(@class, "prime-no-button")]'
             )
         except sel_exceptions.NoSuchElementException:
-            log.error("could not find button")
-            log.info("sign up for Prime and this won't happen anymore")
+            self.logger.error("could not find button")
+            self.logger.info("sign up for Prime and this won't happen anymore")
             self.save_page_source("prime-signup-error")
             self.send_notification(
                 "Prime Sign-up Error occurred",
@@ -1185,7 +1187,7 @@ class Amazon:
             button.click()
             self.wait_for_page_change(current_page)
         else:
-            log.error("Prime offer page popped up, user intervention required")
+            self.logger.error("Prime offer page popped up, user intervention required")
             self.notification_handler.play_alarm_sound()
             self.notification_handler.send_notification(
                 "Prime offer page popped up, user intervention required"
@@ -1193,7 +1195,7 @@ class Amazon:
             timeout = self.get_timeout(timeout=60)
             while self.driver.title in amazon_config["PRIME_TITLES"]:
                 if time.time() > timeout:
-                    log.info(
+                    self.logger.info(
                         "user did not intervene in time, will try and refresh page"
                     )
                     self.driver.refresh()
@@ -1202,12 +1204,12 @@ class Amazon:
 
     @debug
     def handle_home_page(self):
-        log.info("On home page, trying to get back to checkout")
+        self.logger.info("On home page, trying to get back to checkout")
         button = None
         try:
             button = self.driver.find_element_by_xpath('//*[@id="nav-cart"]')
         except sel_exceptions.NoSuchElementException:
-            log.info("Could not find cart button")
+            self.logger.info("Could not find cart button")
         current_page = self.driver.title
         if button:
             button.click()
@@ -1222,7 +1224,7 @@ class Amazon:
             while self.driver.title == current_page:
                 time.sleep(0.25)
                 if time.time() > timeout:
-                    log.info(
+                    self.logger.info(
                         "user failed to intervene in time, returning to stock check"
                     )
                     self.try_to_checkout = False
@@ -1231,7 +1233,7 @@ class Amazon:
     @debug
     def handle_cart(self):
         self.start_time_atc = time.time()
-        log.info("Looking for Proceed To Checkout button...")
+        self.logger.info("Looking for Proceed To Checkout button...")
         try:
             self.save_screenshot("ptc-page")
         except:
@@ -1251,7 +1253,7 @@ class Amazon:
                 except sel_exceptions.NoSuchElementException:
                     pass
             if time.time() > timeout:
-                log.info("couldn't find buttons to proceed to checkout")
+                self.logger.info("couldn't find buttons to proceed to checkout")
                 self.save_page_source("ptc-error")
                 self.send_notification(
                     "Proceed to Checkout Error Occurred",
@@ -1259,21 +1261,21 @@ class Amazon:
                     self.take_screenshots,
                 )
                 if self.get_cart_count() == 0:
-                    log.info("It appears this is because you have no items in cart.")
-                    log.info(
+                    self.logger.info("It appears this is because you have no items in cart.")
+                    self.logger.info(
                         "It is likely that the product went out of stock before you could checkout"
                     )
-                    log.info("Going back to stock check.")
+                    self.logger.info("Going back to stock check.")
                     self.try_to_checkout = False
                 else:
-                    log.info("Refreshing page to try again")
+                    self.logger.info("Refreshing page to try again")
                     self.driver.refresh()
                     self.checkout_retry += 1
                 return
 
         current_page = self.driver.title
         if button:
-            log.info("Found Checkout Button")
+            self.logger.info("Found Checkout Button")
             if self.detailed:
                 self.send_notification(
                     message="Attempting to Proceed to Checkout",
@@ -1282,11 +1284,11 @@ class Amazon:
                 )
             try:
                 button.click()
-                log.info("Clicked Proceed to Checkout Button")
+                self.logger.info("Clicked Proceed to Checkout Button")
                 self.wait_for_page_change(page_title=current_page, timeout=7)
             except sel_exceptions.WebDriverException:
-                log.error("Problem clicking Proceed to Checkout button.")
-                log.info("Refreshing page to try again")
+                self.logger.error("Problem clicking Proceed to Checkout button.")
+                self.logger.info("Refreshing page to try again")
                 self.driver.refresh()
                 self.wait_for_page_change(page_title=current_page)
                 self.checkout_retry += 1
@@ -1306,40 +1308,40 @@ class Amazon:
                 if button.is_enabled() and button.is_displayed():
                     break
             if time.time() > timeout:
-                log.error("couldn't find buttons to proceed to checkout")
+                self.logger.error("couldn't find buttons to proceed to checkout")
                 self.save_page_source("ptc-error")
                 self.send_notification(
                     "Error in checkout.  Please check browser window.",
                     "ptc-error",
                     self.take_screenshots,
                 )
-                log.info("Refreshing page to try again")
+                self.logger.info("Refreshing page to try again")
                 self.driver.refresh()
                 time.sleep(DEFAULT_PAGE_WAIT_DELAY)
                 self.order_retry += 1
                 return
         if test:
-            log.info(f"Found button {button.text}, but this is a test")
-            log.info("will not try to complete order")
-            log.info(f"test time took {time.time() - self.start_time_atc} to check out")
+            self.logger.info(f"Found button {button.text}, but this is a test")
+            self.logger.info("will not try to complete order")
+            self.logger.info(f"test time took {time.time() - self.start_time_atc} to check out")
             self.try_to_checkout = False
             self.great_success = True
             if self.single_shot:
                 self.asin_list = []
         else:
-            log.info(f"Clicking Button {button.text} to place order")
+            self.logger.info(f"Clicking Button {button.text} to place order")
             button.click()
         self.wait_for_page_change(page_title=previous_title)
 
     @debug
     def handle_order_complete(self):
-        log.info("Order Placed.")
+        self.logger.info("Order Placed.")
         self.send_notification("Order placed.", "order-placed", self.take_screenshots)
         self.great_success = True
         if self.single_shot:
             self.asin_list = []
         self.try_to_checkout = False
-        log.info(f"checkout completed in {time.time() - self.start_time_atc} seconds")
+        self.logger.info(f"checkout completed in {time.time() - self.start_time_atc} seconds")
 
     @debug
     def handle_doggos(self):
@@ -1358,7 +1360,7 @@ class Amazon:
     @debug
     def handle_captcha(self, check_presence=True):
         # wait for captcha to load
-        log.debug("Waiting for captcha to load.")
+        self.logger.debug("Waiting for captcha to load.")
         time.sleep(DEFAULT_MAX_WEIRD_PAGE_DELAY)
         current_page = self.driver.title
         try:
@@ -1366,12 +1368,12 @@ class Amazon:
                 '//form[contains(@action,"validateCaptcha")]'
             ):
                 try:
-                    log.info("Stuck on a captcha... Lets try to solve it.")
+                    self.logger.info("Stuck on a captcha... Lets try to solve it.")
                     captcha = AmazonCaptcha.fromdriver(self.driver)
                     solution = captcha.solve()
-                    log.info(f"The solution is: {solution}")
+                    self.logger.info(f"The solution is: {solution}")
                     if solution == "Not solved":
-                        log.info(
+                        self.logger.info(
                             f"Failed to solve {captcha.image_link}, lets reload and get a new captcha."
                         )
                         self.driver.refresh()
@@ -1385,19 +1387,19 @@ class Amazon:
                         ).send_keys(solution + Keys.RETURN)
                         self.wait_for_page_change(page_title=current_page)
                 except Exception as e:
-                    log.debug(e)
-                    log.info("Error trying to solve captcha. Refresh and retry.")
+                    self.logger.debug(e)
+                    self.logger.info("Error trying to solve captcha. Refresh and retry.")
                     self.driver.refresh()
                     time.sleep(3)
         except sel_exceptions.NoSuchElementException:
-            log.error("captcha page does not contain captcha element")
-            log.error("refreshing")
+            self.logger.error("captcha page does not contain captcha element")
+            self.logger.error("refreshing")
             self.driver.refresh()
             time.sleep(3)
 
     @debug
     def handle_business_po(self):
-        log.info("On Business PO Page, Trying to move on to checkout")
+        self.logger.info("On Business PO Page, Trying to move on to checkout")
         button = None
         timeout = self.get_timeout()
         while True:
@@ -1415,7 +1417,7 @@ class Amazon:
             button.click()
             self.wait_for_page_change(page_title=current_page)
         else:
-            log.info(
+            self.logger.info(
                 "Could not find the continue button, user intervention required, complete checkout manually"
             )
             self.notification_handler.send_notification(
@@ -1429,10 +1431,10 @@ class Amazon:
             self.driver.save_screenshot(file_name)
             return file_name
         except sel_exceptions.TimeoutException:
-            log.info("Timed out taking screenshot, trying to continue anyway")
+            self.logger.info("Timed out taking screenshot, trying to continue anyway")
             pass
         except Exception as e:
-            log.error(f"Trying to recover from error: {e}")
+            self.logger.error(f"Trying to recover from error: {e}")
             pass
         return None
 
@@ -1497,7 +1499,7 @@ class Amazon:
         try:
             self.driver.get(url=url)
         except sel_exceptions.WebDriverException or sel_exceptions.TimeoutException:
-            log.error(f"failed to load page at url: {url}")
+            self.logger.error(f"failed to load page at url: {url}")
             return False
         if check_cart_element:
             timeout = self.get_timeout()
@@ -1512,66 +1514,66 @@ class Amazon:
         elif self.wait_for_page_change(current_page):
             return True
         else:
-            log.error("page did not change")
+            self.logger.error("page did not change")
             return False
 
     def __del__(self):
         self.delete_driver()
 
     def show_config(self):
-        log.info(f"{'=' * 50}")
-        log.info(
+        self.logger.info(f"{'=' * 50}")
+        self.logger.info(
             f"Starting Amazon ASIN Hunt on {AMAZON_URLS['BASE_URL']} for {len(self.asin_list)} Products with:"
         )
-        log.info(f"--Offer URL of: {self.ACTIVE_OFFER_URL}")
-        log.info(f"--Delay of {self.refresh_delay} seconds")
+        self.logger.info(f"--Offer URL of: {self.ACTIVE_OFFER_URL}")
+        self.logger.info(f"--Delay of {self.refresh_delay} seconds")
         if self.headless:
-            log.info(f"--Chrome is running in Headless mode")
+            self.logger.info(f"--Chrome is running in Headless mode")
         if self.used:
-            log.info(f"--Used items are considered for purchase")
+            self.logger.info(f"--Used items are considered for purchase")
         if self.checkshipping:
-            log.info(f"--Shipping costs are included in price calculations")
+            self.logger.info(f"--Shipping costs are included in price calculations")
         else:
-            log.info(f"--Free Shipping items only")
+            self.logger.info(f"--Free Shipping items only")
         if self.single_shot:
-            log.info("--Single Shot purchase enabled")
+            self.logger.info("--Single Shot purchase enabled")
         if not self.take_screenshots:
-            log.info(
+            self.logger.info(
                 f"--Screenshotting is Disabled, DO NOT ASK FOR HELP IN TECH SUPPORT IF YOU HAVE NO SCREENSHOTS!"
             )
         if self.detailed:
-            log.info(f"--Detailed screenshots/notifications is enabled")
+            self.logger.info(f"--Detailed screenshots/notifications is enabled")
         if self.log_stock_check:
-            log.info(f"--Additional stock check logging enabled")
+            self.logger.info(f"--Additional stock check logging enabled")
         if self.slow_mode:
-            log.warning(f"--Slow-mode enabled. Pages will fully load before execution.")
+            self.logger.warning(f"--Slow-mode enabled. Pages will fully load before execution.")
         if self.shipping_bypass:
-            log.warning(f"{'=' * 50}")
-            log.warning(f"--FairGame will attempt to choose shipping address.")
-            log.warning(f"USE THIS OPTION AT YOUR OWN RISK!!!")
-            log.warning(
+            self.logger.warning(f"{'=' * 50}")
+            self.logger.warning(f"--FairGame will attempt to choose shipping address.")
+            self.logger.warning(f"USE THIS OPTION AT YOUR OWN RISK!!!")
+            self.logger.warning(
                 f"DO NOT COMPLAIN OR ASK FOR HELP IF BOT SHIPS TO INCORRECT ADDRESS!!!"
             )
-            log.warning(f"Choosing payment options is not available,")
-            log.warning(
+            self.logger.warning(f"Choosing payment options is not available,")
+            self.logger.warning(
                 f"bot may still fail during checkout if defaults are not set on Amazon's site."
             )
-            log.warning(f"{'=' * 50}")
+            self.logger.warning(f"{'=' * 50}")
         for idx, asins in enumerate(self.asin_list):
-            log.info(
+            self.logger.info(
                 f"--Looking for {len(asins)} ASINs between {self.reserve_min[idx]:.2f} and {self.reserve_max[idx]:.2f}"
             )
         if not presence.enabled:
-            log.info(f"--Discord Presence feature is disabled.")
+            self.logger.info(f"--Discord Presence feature is disabled.")
         if self.no_image:
-            log.info(f"--No images will be requested")
+            self.logger.info(f"--No images will be requested")
         if not self.notification_handler.sound_enabled:
-            log.info(f"--Notification sounds are disabled.")
+            self.logger.info(f"--Notification sounds are disabled.")
         if self.ACTIVE_OFFER_URL == AMAZON_URLS["ALT_OFFER_URL"]:
-            log.info(f"--Using alternate offers URL")
+            self.logger.info(f"--Using alternate offers URL")
         if self.testing:
-            log.warning(f"--Testing Mode.  NO Purchases will be made.")
-        log.info(f"{'=' * 50}")
+            self.logger.warning(f"--Testing Mode.  NO Purchases will be made.")
+        self.logger.info(f"{'=' * 50}")
 
     def create_driver(self, path_to_profile):
         if self.setup_driver:
@@ -1615,11 +1617,11 @@ class Amazon:
             self.wait = WebDriverWait(self.driver, 10)
             self.get_webdriver_pids()
         except Exception as e:
-            log.error(e)
-            log.error(
+            self.logger.error(e)
+            self.logger.error(
                 "If you have a JSON warning above, try cleaning your profile (e.g. --clean-profile)"
             )
-            log.error(
+            self.logger.error(
                 "If that's not it, you probably have a previous Chrome window open. You should close it."
             )
 
@@ -1630,22 +1632,22 @@ class Amazon:
     def delete_driver(self):
         try:
             if platform.system() == "Windows" and self.driver:
-                log.info("Cleaning up after web driver...")
+                self.logger.info("Cleaning up after web driver...")
                 # brute force kill child Chrome pids with fire
                 for pid in self.webdriver_child_pids:
                     try:
-                        log.debug(f"Killing {pid}...")
+                        self.logger.debug(f"Killing {pid}...")
                         process = psutil.Process(pid)
                         process.kill()
                     except psutil.NoSuchProcess:
-                        log.debug(f"{pid} not found. Continuing...")
+                        self.logger.debug(f"{pid} not found. Continuing...")
                         pass
             elif self.driver:
                 self.driver.quit()
 
         except Exception as e:
-            log.info(e)
-            log.info(
+            self.logger.info(e)
+            self.logger.info(
                 "Failed to clean up after web driver.  Please manually close browser."
             )
             return False
@@ -1672,12 +1674,12 @@ def get_shipping_costs(tree, free_shipping_string):
         ".//div[starts-with(@id, 'aod-bottlingDepositFee-')]/following-sibling::*[1]"
     )
     count = len(shipping_nodes)
-    log.debug(f"Found {count} shipping nodes.")
+    self.logger.debug(f"Found {count} shipping nodes.")
     if count == 0:
-        log.warning("No shipping nodes found.  Assuming zero.")
+        self.logger.warning("No shipping nodes found.  Assuming zero.")
         return FREE_SHIPPING_PRICE
     elif count > 1:
-        log.warning("Found multiple shipping nodes.  Using the first.")
+        self.logger.warning("Found multiple shipping nodes.  Using the first.")
 
     shipping_node = shipping_nodes[0]
     # Shipping information is found within either a DIV or a SPAN following the bottleDepositFee DIV
@@ -1687,12 +1689,12 @@ def get_shipping_costs(tree, free_shipping_string):
     if shipping_node.tag == "div":
         if shipping_span_text == "":
             # Assume zero shipping for an empty div
-            log.debug(
+            self.logger.debug(
                 "Empty div found after bottleDepositFee.  Assuming zero shipping."
             )
         else:
             # Assume zero shipping for unknown values in
-            log.warning(
+            self.logger.warning(
                 f"Non-Empty div found after bottleDepositFee.  Assuming zero. Stripped Value: '{shipping_span_text}'"
             )
     elif shipping_node.tag == "span":
@@ -1711,32 +1713,32 @@ def get_shipping_costs(tree, free_shipping_string):
             # If the span starts with a "& " it's free shipping (right?)
             if shipping_spans[0].text.strip() == "&":
                 # & Free Shipping message
-                log.debug("Found '& Free', assuming zero.")
+                self.logger.debug("Found '& Free', assuming zero.")
             elif shipping_spans[0].text.startswith("+"):
                 return parse_price(shipping_spans[0].text.strip())
         elif len(shipping_bs) > 0:
             for message_node in shipping_bs:
 
                 if message_node.text.upper() in free_shipping_string:
-                    log.debug("Found free shipping string.")
+                    self.logger.debug("Found free shipping string.")
                 else:
-                    log.error(
+                    self.logger.error(
                         f"Couldn't parse price from <B>. Assuming 0. Do we need to add: '{message_node.text.upper()}'"
                     )
         elif len(shipping_is) > 0:
             # If it has prime icon class, assume free Prime shipping
             if "FREE" in shipping_is[0].attrib["aria-label"].upper():
-                log.debug("Found Free shipping with Prime")
+                self.logger.debug("Found Free shipping with Prime")
         elif any(
             shipping_span_text.upper() in free_message
             for free_message in amazon_config["FREE_SHIPPING"]
         ):
             # We found some version of "free" inside the span.. but this relies on a match
-            log.warning(
+            self.logger.warning(
                 f"Assuming free shipping based on this message: '{shipping_span_text}'"
             )
         else:
-            log.error(
+            self.logger.error(
                 f"Unable to locate price.  Assuming 0.  Found this: '{shipping_span_text}'  Consider reporting to #tech-support Discord."
             )
     return FREE_SHIPPING_PRICE
@@ -1779,16 +1781,16 @@ class AmazonItemCondition(Enum):
 def get_item_condition(form_action) -> AmazonItemCondition:
     """ Attempts to determine the Item Condition from the Add To Cart form action """
     if "_new_" in form_action:
-        # log.debug(f"Item condition is new")
+        # self.logger.debug(f"Item condition is new")
         return AmazonItemCondition.New
     elif "_used_" in form_action:
-        # log.debug(f"Item condition is used")
+        # self.logger.debug(f"Item condition is used")
         return AmazonItemCondition.UsedGood
     elif "_col_" in form_action:
         # og.debug(f"Item condition is collectible")
         return AmazonItemCondition.CollectibleGood
     else:
-        # log.debug(f"Item condition is unknown: {form_action}")
+        # self.logger.debug(f"Item condition is unknown: {form_action}")
         return AmazonItemCondition.Unknown
 
 
@@ -1798,7 +1800,7 @@ def wait_for_element_by_xpath(d, xpath, timeout=10):
             EC.presence_of_element_located((By.XPATH, xpath))
         )
     except sel_exceptions.TimeoutException:
-        log.error(f"failed to find {xpath}")
+        self.logger.error(f"failed to find {xpath}")
         return False
 
     return True

@@ -13,8 +13,16 @@ if __name__ == "__main__":
 
         processes = []
         for i, c in enumerate(conf["configs"]):
-            p = subprocess.Popen("python app.py amazon --test --no-image --p=1 --conf-index={} >> logs/index-logs/{}.log".format(i, i), shell=True)
+            f =  open("logs/index-logs/{}.log".format(i), "w")
+            p = subprocess.Popen("python app.py amazon --no-image --p=1 --conf-index=3 >> logs/index-logs/{}.log".format(i, i), shell=True, stdout=f)
+            #p.communicate()
             processes.append(p)
+            break
+
+        while any([p.poll() is None for p in processes]):
+            continue
+        print("all processess exited")
+
 
     except Exception as e:
         print(e)

@@ -22,6 +22,8 @@ import logging
 import os
 from utils.version import version
 from logging import handlers
+import sys
+import pathlib
 
 FORMAT = "%(asctime)s|{}|%(levelname)s|%(message)s".format(version)
 
@@ -61,9 +63,49 @@ log = logging.getLogger("fairgame")
 log.setLevel(logging.DEBUG)
 
 LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()
-stream_handler = logging.StreamHandler()
+stream_handler = logging.StreamHandler(sys.stdout)
 stream_handler.setFormatter(logging.Formatter(FORMAT))
 
 log.addHandler(stream_handler)
 
 coloredlogs.install(LOGLEVEL, logger=log, fmt=FORMAT)
+
+
+def make_logger(subdir):
+    log_path = os.path.join("logs/{}".format(subdir), LOG_FILE_NAME)
+    path = pathlib.Path(log_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    # This check *must* be executed before logging.basicConfig because, at least on Windows,
+    # basicConfig creates a lock on the log file that prevents renaming.  Possibly a workaround
+    # but putting this first seems to dodge the issue
+    if os.path.isfile(log_path):
+        # Create a transient handler to do the rollover for us on startup.  This won't
+        # be added to the logger as a handler... just used to roll the log on startup.
+        rollover_handler = handlers.RotatingFileHandler(
+            log_path, backupCount=10, maxBytes=100 * 1024 * 1024
+        )
+        # Prior log file exists, so roll it to get a clean log for this run
+        try:
+            rollover_handler.doRollover()
+        except Exception:
+            print("An erorr happened when making the log")
+            # Eat it since it's *probably* non-fatal and since we're *probably* still able to log to the prior file
+            pass
+
+    logg = logging.getLogger("fairgame-custom")
+    logg.setLevel(logging.DEBUG)
+
+    filehandler = logging.FileHandler(log_path)
+    filehandler.setFormatter(logging.Formatter(FORMAT))
+    logg.addHandler(filehandler)
+
+
+    LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()
+    stream_handler = logging.StreamHandler(sys.stdout)
+    stream_handler.setFormatter(logging.Formatter(FORMAT))
+
+    logg.addHandler(stream_handler)
+
+    coloredlogs.install(LOGLEVEL, logger=logg, fmt=FORMAT)
+
+    return logg
